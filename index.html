@@ -109,33 +109,57 @@
       opacity: 0.9;
     }
 
+    .messages-feed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      gap: 15px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .messages-feed::-webkit-scrollbar {
+      display: none;
+    }
+
     .message {
-      font-size: 3.5rem;
+      font-size: 2.2rem;
       font-weight: 600;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 25px;
-      padding: 50px 70px;
-      margin: 20px;
+      border-radius: 20px;
+      padding: 25px 35px;
+      margin: 0;
       box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 10px 20px rgba(0, 0, 0, 0.05),
+        0 15px 30px rgba(0, 0, 0, 0.1),
+        0 8px 15px rgba(0, 0, 0, 0.05),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
       text-align: center;
       color: #2d3748;
-      max-width: 85%;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      max-width: 90%;
+      min-width: 300px;
       position: relative;
       overflow: hidden;
-      line-height: 1.4;
-      letter-spacing: 1px;
-      animation: messageEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      line-height: 1.3;
+      letter-spacing: 0.5px;
+      animation: messageSlideIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
       opacity: 0;
-      transform: scale(0.8) translateY(50px);
+      transform: translateX(-50px);
+      word-wrap: break-word;
+    }
+
+    .message.new {
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(76, 175, 80, 0.85));
+      color: white;
+      box-shadow: 
+        0 15px 30px rgba(76, 175, 80, 0.3),
+        0 8px 15px rgba(76, 175, 80, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     .message::before {
@@ -155,33 +179,18 @@
       100% { left: 100%; }
     }
 
-    @keyframes messageEntrance {
+    @keyframes messageSlideIn {
       0% {
         opacity: 0;
-        transform: scale(0.8) translateY(50px) rotateX(15deg);
+        transform: translateX(-50px) scale(0.95);
       }
       60% {
         opacity: 1;
-        transform: scale(1.05) translateY(-10px) rotateX(0deg);
+        transform: translateX(5px) scale(1.02);
       }
       100% {
         opacity: 1;
-        transform: scale(1) translateY(0) rotateX(0deg);
-      }
-    }
-
-    .message.exit {
-      animation: messageExit 0.8s ease-in forwards;
-    }
-
-    @keyframes messageExit {
-      0% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(0.9) translateY(-30px);
+        transform: translateX(0) scale(1);
       }
     }
 
@@ -210,14 +219,57 @@
       border-radius: 20px;
       backdrop-filter: blur(10px);
       z-index: 15;
+      transition: all 0.3s ease;
+    }
+
+    .message-counter.new-message {
+      background: rgba(76, 175, 80, 0.8);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    }
+
+    .new-message-notification {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(76, 175, 80, 0.95);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 15px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      z-index: 20;
+      animation: newMessagePulse 2s ease-out forwards;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes newMessagePulse {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
     }
 
     /* Large screen optimizations */
     @media (min-width: 1920px) {
       .message {
-        font-size: 4.5rem;
-        padding: 70px 90px;
-        min-height: 250px;
+        font-size: 2.8rem;
+        padding: 35px 45px;
+        min-width: 400px;
       }
       
       .event-title {
@@ -231,9 +283,9 @@
 
     @media (min-width: 2560px) {
       .message {
-        font-size: 5.5rem;
-        padding: 90px 120px;
-        min-height: 300px;
+        font-size: 3.2rem;
+        padding: 40px 55px;
+        min-width: 500px;
       }
       
       .event-title {
@@ -277,7 +329,9 @@
     <div class="event-subtitle">リアルタイム投稿表示</div>
   </div>
 
-  <div class="container" id="messageContainer"></div>
+  <div class="container">
+    <div class="messages-feed" id="messageContainer"></div>
+  </div>
 
   <div class="message-counter" id="messageCounter">
     メッセージ: 0
@@ -289,19 +343,38 @@
     let totalMessages = 0;
     let isTransitioning = false;
 
+    let lastMessageCount = 0;
+    let currentMessages = [];
+    let displayedMessages = new Set();
+
     async function fetchMessages() {
       try {
-        const res = await fetch(scriptURL);
+        const res = await fetch(scriptURL + '?t=' + Date.now()); // Add cache busting
         const messages = await res.json();
         const validMessages = messages.filter(msg => typeof msg === "string" && msg.trim().length > 0);
 
         totalMessages = validMessages.length;
         updateMessageCounter();
 
-        if (validMessages.length === 0) {
+        // Check if new messages were added
+        if (validMessages.length > lastMessageCount) {
+          const newMessageCount = validMessages.length - lastMessageCount;
+          console.log(`新しいメッセージが${newMessageCount}件追加されました`);
+          showNewMessageNotification();
+          
+          // Add new messages to display
+          const newMessages = validMessages.slice(lastMessageCount);
+          addNewMessages(newMessages);
+        }
+        
+        lastMessageCount = validMessages.length;
+        currentMessages = validMessages;
+
+        // Initial load - show all messages
+        if (displayedMessages.size === 0 && validMessages.length > 0) {
+          showAllMessages(validMessages);
+        } else if (validMessages.length === 0) {
           showNoMessage();
-        } else {
-          showMessages(validMessages);
         }
       } catch (error) {
         console.error("データ取得失敗:", error);
@@ -311,67 +384,109 @@
 
     function updateMessageCounter() {
       const counter = document.getElementById('messageCounter');
-      counter.textContent = `メッセージ: ${totalMessages}`;
+      counter.textContent = `メッセージ: ${totalMessages} (5秒更新)`;
     }
 
-    function showMessages(messages) {
+    function showNewMessageNotification() {
+      // Flash the counter
+      const counter = document.getElementById('messageCounter');
+      counter.classList.add('new-message');
+      setTimeout(() => {
+        counter.classList.remove('new-message');
+      }, 1000);
+
+      // Show notification popup
+      const notification = document.createElement('div');
+      notification.className = 'new-message-notification';
+      notification.textContent = '新しいメッセージが届きました！ 🎉';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 2000);
+    }
+
+    function showAllMessages(messages) {
       const container = document.getElementById('messageContainer');
-      let index = 0;
-
-      function showNextMessage() {
-        if (isTransitioning) return;
-        
-        isTransitioning = true;
-        
-        // Exit animation for current message
-        const currentMessage = container.querySelector('.message');
-        if (currentMessage) {
-          currentMessage.classList.add('exit');
-          setTimeout(() => {
-            container.innerHTML = "";
-            displayNewMessage();
-          }, 800);
-        } else {
-          displayNewMessage();
-        }
-
-        function displayNewMessage() {
+      
+      // Clear existing messages if this is initial load
+      if (displayedMessages.size === 0) {
+        container.innerHTML = "";
+      }
+      
+      messages.forEach((messageText, index) => {
+        if (!displayedMessages.has(messageText)) {
           const message = document.createElement('div');
           message.className = 'message';
-          message.textContent = messages[index];
-          container.appendChild(message);
-
-          // Update current index for counter
-          currentMessageIndex = index + 1;
+          message.textContent = messageText;
+          message.setAttribute('data-message', messageText);
           
-          index = (index + 1) % messages.length;
+          // Add to top of feed (newest first)
+          if (container.firstChild) {
+            container.insertBefore(message, container.firstChild);
+          } else {
+            container.appendChild(message);
+          }
           
+          displayedMessages.add(messageText);
+          
+          // Scroll to top to show newest message
           setTimeout(() => {
-            isTransitioning = false;
-          }, 1200);
-          
-          setTimeout(showNextMessage, 4000);
+            container.scrollTop = 0;
+          }, 100);
         }
-      }
+      });
+    }
 
-      showNextMessage();
+    function addNewMessages(newMessages) {
+      const container = document.getElementById('messageContainer');
+      
+      newMessages.forEach((messageText) => {
+        if (!displayedMessages.has(messageText)) {
+          const message = document.createElement('div');
+          message.className = 'message new';
+          message.textContent = messageText;
+          message.setAttribute('data-message', messageText);
+          
+          // Add to top of feed (newest first)
+          if (container.firstChild) {
+            container.insertBefore(message, container.firstChild);
+          } else {
+            container.appendChild(message);
+          }
+          
+          displayedMessages.add(messageText);
+          
+          // Remove 'new' class after animation
+          setTimeout(() => {
+            message.classList.remove('new');
+          }, 3000);
+          
+          // Scroll to top to show newest message
+          setTimeout(() => {
+            container.scrollTop = 0;
+          }, 100);
+        }
+      });
     }
 
     function showNoMessage() {
       const container = document.getElementById('messageContainer');
-      container.innerHTML = "";
-
-      const message = document.createElement('div');
-      message.className = 'no-message';
-      message.textContent = "投稿をお待ちしています... 💬✨";
-      container.appendChild(message);
+      
+      // Only show no message if container is completely empty
+      if (container.children.length === 0) {
+        const message = document.createElement('div');
+        message.className = 'no-message';
+        message.textContent = "投稿をお待ちしています... 💬✨";
+        container.appendChild(message);
+      }
       
       currentMessageIndex = 0;
     }
 
-    // Refresh messages every 30 seconds to get new submissions
+    // Refresh messages every 5 seconds for near real-time updates
     function startPeriodicRefresh() {
-      setInterval(fetchMessages, 30000);
+      setInterval(fetchMessages, 5000);
     }
 
     window.onload = () => {
