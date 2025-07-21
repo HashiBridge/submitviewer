@@ -110,9 +110,7 @@
     }
 
     .messages-feed {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: grid;
       width: 100%;
       max-height: 80vh;
       overflow-y: auto;
@@ -120,6 +118,29 @@
       gap: 15px;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      justify-items: center;
+      align-content: start;
+    }
+
+    /* Adaptive grid layouts based on message count */
+    .messages-feed.layout-1-3 {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .messages-feed.layout-4-6 {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .messages-feed.layout-7-12 {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+    }
+
+    .messages-feed.layout-13-plus {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
     }
 
     .messages-feed::-webkit-scrollbar {
@@ -127,13 +148,11 @@
     }
 
     .message {
-      font-size: 2.2rem;
       font-weight: 600;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
-      padding: 25px 35px;
       margin: 0;
       box-shadow: 
         0 15px 30px rgba(0, 0, 0, 0.1),
@@ -141,8 +160,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
       text-align: center;
       color: #2d3748;
-      max-width: 90%;
-      min-width: 300px;
+      width: 100%;
       position: relative;
       overflow: hidden;
       line-height: 1.3;
@@ -151,6 +169,34 @@
       opacity: 0;
       transform: translateX(-50px);
       word-wrap: break-word;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Adaptive message sizing based on layout */
+    .layout-1-3 .message {
+      font-size: 2.4rem;
+      padding: 30px 40px;
+      min-height: 120px;
+    }
+
+    .layout-4-6 .message {
+      font-size: 2.0rem;
+      padding: 25px 30px;
+      min-height: 100px;
+    }
+
+    .layout-7-12 .message {
+      font-size: 1.7rem;
+      padding: 20px 25px;
+      min-height: 90px;
+    }
+
+    .layout-13-plus .message {
+      font-size: 1.4rem;
+      padding: 15px 20px;
+      min-height: 80px;
     }
 
     .message.new {
@@ -231,10 +277,28 @@
 
     /* Large screen optimizations */
     @media (min-width: 1920px) {
-      .message {
-        font-size: 2.8rem;
+      .layout-1-3 .message {
+        font-size: 3.0rem;
         padding: 35px 45px;
-        min-width: 400px;
+        min-height: 140px;
+      }
+
+      .layout-4-6 .message {
+        font-size: 2.4rem;
+        padding: 30px 35px;
+        min-height: 120px;
+      }
+
+      .layout-7-12 .message {
+        font-size: 2.0rem;
+        padding: 25px 30px;
+        min-height: 100px;
+      }
+
+      .layout-13-plus .message {
+        font-size: 1.6rem;
+        padding: 20px 25px;
+        min-height: 90px;
       }
       
       .event-title {
@@ -247,10 +311,28 @@
     }
 
     @media (min-width: 2560px) {
-      .message {
-        font-size: 3.2rem;
+      .layout-1-3 .message {
+        font-size: 3.4rem;
         padding: 40px 55px;
-        min-width: 500px;
+        min-height: 160px;
+      }
+
+      .layout-4-6 .message {
+        font-size: 2.8rem;
+        padding: 35px 45px;
+        min-height: 140px;
+      }
+
+      .layout-7-12 .message {
+        font-size: 2.3rem;
+        padding: 30px 35px;
+        min-height: 120px;
+      }
+
+      .layout-13-plus .message {
+        font-size: 1.8rem;
+        padding: 25px 30px;
+        min-height: 100px;
       }
       
       .event-title {
@@ -268,8 +350,22 @@
         padding: 60px 120px;
       }
       
-      .message {
+      .messages-feed.layout-1-3 {
+        grid-template-columns: 1fr;
         max-width: 70%;
+        margin: 0 auto;
+      }
+      
+      .messages-feed.layout-4-6 {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .messages-feed.layout-7-12 {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+      
+      .messages-feed.layout-13-plus {
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
       }
     }
   </style>
@@ -320,6 +416,7 @@
 
         totalMessages = validMessages.length;
         updateMessageCounter();
+        updateLayoutClass(totalMessages);
 
         // Check if new messages were added
         if (validMessages.length > lastMessageCount) {
@@ -352,6 +449,24 @@
       counter.textContent = `メッセージ: ${totalMessages} (5秒更新)`;
     }
 
+    function updateLayoutClass(messageCount) {
+      const container = document.getElementById('messageContainer');
+      
+      // Remove all layout classes
+      container.classList.remove('layout-1-3', 'layout-4-6', 'layout-7-12', 'layout-13-plus');
+      
+      // Add appropriate layout class based on message count
+      if (messageCount <= 3) {
+        container.classList.add('layout-1-3');
+      } else if (messageCount <= 6) {
+        container.classList.add('layout-4-6');
+      } else if (messageCount <= 12) {
+        container.classList.add('layout-7-12');
+      } else {
+        container.classList.add('layout-13-plus');
+      }
+    }
+
     function showNewMessageNotification() {
       // Flash the counter
       const counter = document.getElementById('messageCounter');
@@ -379,19 +494,10 @@
           message.textContent = messageText;
           message.setAttribute('data-message', messageText);
           
-          // Add to top of feed (newest first)
-          if (container.firstChild) {
-            container.insertBefore(message, container.firstChild);
-          } else {
-            container.appendChild(message);
-          }
+          // For grid layout, append messages in order (newest will be positioned by CSS grid)
+          container.appendChild(message);
           
           displayedMessages.add(messageText);
-          
-          // Scroll to top to show newest message
-          setTimeout(() => {
-            container.scrollTop = 0;
-          }, 100);
         }
       });
     }
@@ -406,12 +512,8 @@
           message.textContent = messageText;
           message.setAttribute('data-message', messageText);
           
-          // Add to top of feed (newest first)
-          if (container.firstChild) {
-            container.insertBefore(message, container.firstChild);
-          } else {
-            container.appendChild(message);
-          }
+          // For grid layout, append new messages (they'll be positioned by CSS grid)
+          container.appendChild(message);
           
           displayedMessages.add(messageText);
           
@@ -419,11 +521,6 @@
           setTimeout(() => {
             message.classList.remove('new');
           }, 3000);
-          
-          // Scroll to top to show newest message
-          setTimeout(() => {
-            container.scrollTop = 0;
-          }, 100);
         }
       });
     }
