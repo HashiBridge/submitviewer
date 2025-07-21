@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>イベント投稿表示</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', 'Helvetica Neue', sans-serif;
+      overflow: hidden;
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      position: relative;
+      height: 100vh;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .background-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 1s; }
+    .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 2s; }
+    .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 3s; }
+    .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 4s; }
+    .particle:nth-child(6) { width: 6px; height: 6px; left: 60%; animation-delay: 5s; }
+    .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: 0.5s; }
+    .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: 1.5s; }
+    .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: 2.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 40px;
+    }
+
+    .event-header {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      text-align: center;
+      z-index: 15;
+    }
+
+    .event-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .event-subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      opacity: 0.9;
+    }
+
+    .message {
+      font-size: 3.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 50px 70px;
+      margin: 20px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      text-align: center;
+      color: #2d3748;
+      max-width: 85%;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      line-height: 1.4;
+      letter-spacing: 1px;
+      animation: messageEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+      transform: scale(0.8) translateY(50px);
+    }
+
+    .message::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes messageEntrance {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px) rotateX(15deg);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.05) translateY(-10px) rotateX(0deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0deg);
+      }
+    }
+
+    .message.exit {
+      animation: messageExit 0.8s ease-in forwards;
+    }
+
+    @keyframes messageExit {
+      0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-30px);
+      }
+    }
+
+    .no-message {
+      font-size: 2.8rem;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .message-counter {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 10px 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      z-index: 15;
+    }
+
+    /* Large screen optimizations */
+    @media (min-width: 1920px) {
+      .message {
+        font-size: 4.5rem;
+        padding: 70px 90px;
+        min-height: 250px;
+      }
+      
+      .event-title {
+        font-size: 3.2rem;
+      }
+      
+      .event-subtitle {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (min-width: 2560px) {
+      .message {
+        font-size: 5.5rem;
+        padding: 90px 120px;
+        min-height: 300px;
+      }
+      
+      .event-title {
+        font-size: 4rem;
+      }
+      
+      .event-subtitle {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Ultra-wide screen support */
+    @media (min-aspect-ratio: 21/9) {
+      .container {
+        padding: 60px 120px;
+      }
+      
+      .message {
+        max-width: 70%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-overlay"></div>
+  
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="event-header">
+    <div class="event-title">🎉 LIVE MESSAGES 🎉</div>
+    <div class="event-subtitle">リアルタイム投稿表示</div>
+  </div>
+
+  <div class="container" id="messageContainer"></div>
+
+  <div class="message-counter" id="messageCounter">
+    メッセージ: 0
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzCtGLoNqGC_QogSQNdmxd7AFZBBO3zhKtt77cUZ-vzIkdZoyVaJ1n0bm2be9J7Pu_9/exec";
+    let currentMessageIndex = 0;
+    let totalMessages = 0;
+    let isTransitioning = false;
+
+    async function fetchMessages() {
+      try {
+        const res = await fetch(scriptURL);
+        const messages = await res.json();
+        const validMessages = messages.filter(msg => typeof msg === "string" && msg.trim().length > 0);
+
+        totalMessages = validMessages.length;
+        updateMessageCounter();
+
+        if (validMessages.length === 0) {
+          showNoMessage();
+        } else {
+          showMessages(validMessages);
+        }
+      } catch (error) {
+        console.error("データ取得失敗:", error);
+        showNoMessage();
+      }
+    }
+
+    function updateMessageCounter() {
+      const counter = document.getElementById('messageCounter');
+      counter.textContent = `メッセージ: ${totalMessages}`;
+    }
+
+    function showMessages(messages) {
+      const container = document.getElementById('messageContainer');
+      let index = 0;
+
+      function showNextMessage() {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        
+        // Exit animation for current message
+        const currentMessage = container.querySelector('.message');
+        if (currentMessage) {
+          currentMessage.classList.add('exit');
+          setTimeout(() => {
+            container.innerHTML = "";
+            displayNewMessage();
+          }, 800);
+        } else {
+          displayNewMessage();
+        }
+
+        function displayNewMessage() {
+          const message = document.createElement('div');
+          message.className = 'message';
+          message.textContent = messages[index];
+          container.appendChild(message);
+
+          // Update current index for counter
+          currentMessageIndex = index + 1;
+          
+          index = (index + 1) % messages.length;
+          
+          setTimeout(() => {
+            isTransitioning = false;
+          }, 1200);
+          
+          setTimeout(showNextMessage, 4000);
+        }
+      }
+
+      showNextMessage();
+    }
+
+    function showNoMessage() {
+      const container = document.getElementById('messageContainer');
+      container.innerHTML = "";
+
+      const message = document.createElement('div');
+      message.className = 'no-message';
+      message.textContent = "投稿をお待ちしています... 💬✨";
+      container.appendChild(message);
+      
+      currentMessageIndex = 0;
+    }
+
+    // Refresh messages every 30 seconds to get new submissions
+    function startPeriodicRefresh() {
+      setInterval(fetchMessages, 30000);
+    }
+
+    window.onload = () => {
+      fetchMessages();
+      startPeriodicRefresh();
+    };
+
+    // Add keyboard controls for presentation mode
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
