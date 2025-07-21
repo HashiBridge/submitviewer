@@ -228,41 +228,6 @@
       box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
     }
 
-    .new-message-notification {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(76, 175, 80, 0.95);
-      color: white;
-      padding: 20px 40px;
-      border-radius: 15px;
-      font-size: 1.5rem;
-      font-weight: 600;
-      z-index: 20;
-      animation: newMessagePulse 2s ease-out forwards;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    @keyframes newMessagePulse {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-      }
-      20% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.1);
-      }
-      80% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-      }
-    }
 
     /* Large screen optimizations */
     @media (min-width: 1920px) {
@@ -395,15 +360,8 @@
         counter.classList.remove('new-message');
       }, 1000);
 
-      // Show notification popup
-      const notification = document.createElement('div');
-      notification.className = 'new-message-notification';
-      notification.textContent = '新しいメッセージが届きました！ 🎉';
-      document.body.appendChild(notification);
-
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 2000);
+      // Popup notification removed per user request
+      // Green highlighting of new messages is preserved in addNewMessages()
     }
 
     function showAllMessages(messages) {
