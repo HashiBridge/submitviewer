@@ -408,6 +408,12 @@
     let currentMessages = [];
     let displayedMessages = new Set();
 
+    // Expose variables to global scope for debugging
+    window.totalMessages = totalMessages;
+    window.currentMessages = currentMessages;
+    window.displayedMessages = displayedMessages;
+    window.lastMessageCount = lastMessageCount;
+
     async function fetchMessages() {
       try {
         const res = await fetch(scriptURL + '?t=' + Date.now()); // Add cache busting
@@ -415,6 +421,7 @@
         const validMessages = messages.filter(msg => typeof msg === "string" && msg.trim().length > 0);
 
         totalMessages = validMessages.length;
+        window.totalMessages = totalMessages;
         updateMessageCounter();
         updateLayoutClass(totalMessages);
 
@@ -423,19 +430,17 @@
           const newMessageCount = validMessages.length - lastMessageCount;
           console.log(`新しいメッセージが${newMessageCount}件追加されました`);
           showNewMessageNotification();
-          
-          // Add new messages to display
-          const newMessages = validMessages.slice(lastMessageCount);
-          addNewMessages(newMessages);
         }
         
         lastMessageCount = validMessages.length;
         currentMessages = validMessages;
+        window.lastMessageCount = lastMessageCount;
+        window.currentMessages = currentMessages;
 
-        // Initial load - show all messages
-        if (displayedMessages.size === 0 && validMessages.length > 0) {
+        // Always ensure all messages from API are displayed
+        if (validMessages.length > 0) {
           showAllMessages(validMessages);
-        } else if (validMessages.length === 0) {
+        } else {
           showNoMessage();
         }
       } catch (error) {
@@ -490,40 +495,25 @@
       messages.forEach((messageText, index) => {
         if (!displayedMessages.has(messageText)) {
           const message = document.createElement('div');
-          message.className = 'message';
+          // Highlight new messages (those beyond lastMessageCount)
+          const isNewMessage = index >= lastMessageCount;
+          message.className = isNewMessage ? 'message new' : 'message';
           message.textContent = messageText;
           message.setAttribute('data-message', messageText);
           
-          // For grid layout, append messages in order (newest will be positioned by CSS grid)
           container.appendChild(message);
-          
           displayedMessages.add(messageText);
+          
+          // Remove 'new' class after animation for new messages
+          if (isNewMessage) {
+            setTimeout(() => {
+              message.classList.remove('new');
+            }, 3000);
+          }
         }
       });
     }
 
-    function addNewMessages(newMessages) {
-      const container = document.getElementById('messageContainer');
-      
-      newMessages.forEach((messageText) => {
-        if (!displayedMessages.has(messageText)) {
-          const message = document.createElement('div');
-          message.className = 'message new';
-          message.textContent = messageText;
-          message.setAttribute('data-message', messageText);
-          
-          // For grid layout, append new messages (they'll be positioned by CSS grid)
-          container.appendChild(message);
-          
-          displayedMessages.add(messageText);
-          
-          // Remove 'new' class after animation
-          setTimeout(() => {
-            message.classList.remove('new');
-          }, 3000);
-        }
-      });
-    }
 
     function showNoMessage() {
       const container = document.getElementById('messageContainer');
