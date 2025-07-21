@@ -180,21 +180,25 @@
     }
 
     .layout-1-3 .message {
+      font-size: 3.5rem;
       font-weight: 600;
       min-height: 120px;
     }
 
     .layout-4-6 .message {
+      font-size: 2.8rem;
       font-weight: 600;
       min-height: 100px;
     }
 
     .layout-7-12 .message {
+      font-size: 2.2rem;
       font-weight: 500;
       min-height: 80px;
     }
 
     .layout-13-plus .message {
+      font-size: 1.8rem;
       font-weight: 500;
       min-height: 60px;
     }
@@ -297,19 +301,23 @@
     /* Large screen optimizations */
     @media (min-width: 1920px) {
       .layout-1-3 .message {
+        font-size: 4.5rem;
         padding: 70px 90px;
         min-height: 200px;
       }
 
       .layout-4-6 .message {
+        font-size: 3.5rem;
         min-height: 160px;
       }
 
       .layout-7-12 .message {
+        font-size: 2.8rem;
         min-height: 130px;
       }
 
       .layout-13-plus .message {
+        font-size: 2.2rem;
         min-height: 100px;
       }
       
@@ -324,19 +332,23 @@
 
     @media (min-width: 2560px) {
       .layout-1-3 .message {
+        font-size: 5.5rem;
         padding: 90px 120px;
         min-height: 250px;
       }
 
       .layout-4-6 .message {
+        font-size: 4.2rem;
         min-height: 200px;
       }
 
       .layout-7-12 .message {
+        font-size: 3.2rem;
         min-height: 160px;
       }
 
       .layout-13-plus .message {
+        font-size: 2.6rem;
         min-height: 120px;
       }
       
@@ -437,37 +449,8 @@
       }
     }
 
-    function calculateOptimalFontSize(messageText, layoutClass) {
-      const messageLength = messageText.length;
-      
-      const layoutConfig = {
-        'layout-1-3': { base: 3.5, min: 2.0, max: 3.5 },
-        'layout-4-6': { base: 2.8, min: 1.6, max: 2.8 },
-        'layout-7-12': { base: 2.2, min: 1.2, max: 2.2 },
-        'layout-13-plus': { base: 1.8, min: 1.0, max: 1.8 }
-      };
-      
-      const config = layoutConfig[layoutClass] || layoutConfig['layout-1-3'];
-      
-      let fontSize;
-      if (messageLength <= 20) {
-        fontSize = config.base;
-      } else if (messageLength <= 50) {
-        fontSize = config.base * 0.85;
-      } else if (messageLength <= 100) {
-        fontSize = config.base * 0.7;
-      } else {
-        fontSize = config.base * 0.55;
-      }
-      
-      fontSize = Math.max(config.min, Math.min(config.max, fontSize));
-      
-      return fontSize;
-    }
-
     function showAllMessages(messages) {
       const container = document.getElementById('messageContainer');
-      const currentLayoutClass = Array.from(container.classList).find(cls => cls.startsWith('layout-'));
       
       messages.forEach((messageText, index) => {
         if (!displayedMessages.has(messageText)) {
@@ -476,9 +459,6 @@
           message.className = isNewMessage ? 'message new' : 'message';
           message.textContent = messageText;
           message.setAttribute('data-message', messageText);
-          
-          const optimalFontSize = calculateOptimalFontSize(messageText, currentLayoutClass);
-          message.style.fontSize = `${optimalFontSize}rem`;
           
           container.appendChild(message);
           displayedMessages.add(messageText);
