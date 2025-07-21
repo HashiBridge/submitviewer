@@ -109,26 +109,60 @@
       opacity: 0.9;
     }
 
+    .messages-feed {
+      display: grid;
+      gap: 20px;
+      padding: 20px;
+      width: 100%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .messages-feed::-webkit-scrollbar {
+      display: none;
+    }
+
+    .layout-1-3 {
+      grid-template-columns: 1fr;
+      grid-auto-rows: min-content;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .layout-4-6 {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: min-content;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .layout-7-12 {
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: min-content;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .layout-13-plus {
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: min-content;
+      max-width: 2000px;
+      margin: 0 auto;
+    }
+
     .message {
-      font-size: 3.5rem;
-      font-weight: 600;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 25px;
-      padding: 50px 70px;
-      margin: 20px;
+      padding: 30px;
       box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.1),
         0 10px 20px rgba(0, 0, 0, 0.05),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
       text-align: center;
       color: #2d3748;
-      max-width: 85%;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: relative;
       overflow: hidden;
       line-height: 1.4;
@@ -136,6 +170,58 @@
       animation: messageEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
       opacity: 0;
       transform: scale(0.8) translateY(50px);
+      height: auto;
+      word-wrap: break-word;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .layout-1-3 .message {
+      font-size: 3.5rem;
+      font-weight: 600;
+      min-height: 120px;
+    }
+
+    .layout-4-6 .message {
+      font-size: 2.8rem;
+      font-weight: 600;
+      min-height: 100px;
+    }
+
+    .layout-7-12 .message {
+      font-size: 2.2rem;
+      font-weight: 500;
+      min-height: 80px;
+    }
+
+    .layout-13-plus .message {
+      font-size: 1.8rem;
+      font-weight: 500;
+      min-height: 60px;
+    }
+
+    .message.new {
+      background: linear-gradient(135deg, rgba(144, 238, 144, 0.95), rgba(144, 238, 144, 0.85));
+      border: 2px solid rgba(0, 255, 0, 0.3);
+      animation: newMessagePulse 3s ease-in-out;
+    }
+
+    @keyframes newMessagePulse {
+      0%, 100% { 
+        box-shadow: 
+          0 20px 40px rgba(0, 0, 0, 0.1),
+          0 10px 20px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      50% { 
+        box-shadow: 
+          0 20px 40px rgba(0, 255, 0, 0.2),
+          0 10px 20px rgba(0, 255, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
     }
 
     .message::before {
@@ -214,10 +300,25 @@
 
     /* Large screen optimizations */
     @media (min-width: 1920px) {
-      .message {
+      .layout-1-3 .message {
         font-size: 4.5rem;
         padding: 70px 90px;
-        min-height: 250px;
+        min-height: 200px;
+      }
+
+      .layout-4-6 .message {
+        font-size: 3.5rem;
+        min-height: 160px;
+      }
+
+      .layout-7-12 .message {
+        font-size: 2.8rem;
+        min-height: 130px;
+      }
+
+      .layout-13-plus .message {
+        font-size: 2.2rem;
+        min-height: 100px;
       }
       
       .event-title {
@@ -230,10 +331,25 @@
     }
 
     @media (min-width: 2560px) {
-      .message {
+      .layout-1-3 .message {
         font-size: 5.5rem;
         padding: 90px 120px;
-        min-height: 300px;
+        min-height: 250px;
+      }
+
+      .layout-4-6 .message {
+        font-size: 4.2rem;
+        min-height: 200px;
+      }
+
+      .layout-7-12 .message {
+        font-size: 3.2rem;
+        min-height: 160px;
+      }
+
+      .layout-13-plus .message {
+        font-size: 2.6rem;
+        min-height: 120px;
       }
       
       .event-title {
@@ -251,8 +367,8 @@
         padding: 60px 120px;
       }
       
-      .message {
-        max-width: 70%;
+      .messages-feed {
+        max-width: 90%;
       }
     }
   </style>
@@ -277,7 +393,9 @@
     <div class="event-subtitle">リアルタイム投稿表示</div>
   </div>
 
-  <div class="container" id="messageContainer"></div>
+  <div class="container">
+    <div class="messages-feed" id="messageContainer"></div>
+  </div>
 
   <div class="message-counter" id="messageCounter">
     メッセージ: 0
@@ -285,9 +403,8 @@
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbzCtGLoNqGC_QogSQNdmxd7AFZBBO3zhKtt77cUZ-vzIkdZoyVaJ1n0bm2be9J7Pu_9/exec";
-    let currentMessageIndex = 0;
-    let totalMessages = 0;
-    let isTransitioning = false;
+    let displayedMessages = new Set();
+    let lastMessageCount = 0;
 
     async function fetchMessages() {
       try {
@@ -295,83 +412,79 @@
         const messages = await res.json();
         const validMessages = messages.filter(msg => typeof msg === "string" && msg.trim().length > 0);
 
-        totalMessages = validMessages.length;
-        updateMessageCounter();
+        updateMessageCounter(validMessages.length);
+        updateLayoutClass(validMessages.length);
 
-        if (validMessages.length === 0) {
-          showNoMessage();
+        if (validMessages.length > 0) {
+          showAllMessages(validMessages);
         } else {
-          showMessages(validMessages);
+          showNoMessage();
         }
+
+        lastMessageCount = validMessages.length;
       } catch (error) {
         console.error("データ取得失敗:", error);
         showNoMessage();
       }
     }
 
-    function updateMessageCounter() {
+    function updateMessageCounter(count) {
       const counter = document.getElementById('messageCounter');
-      counter.textContent = `メッセージ: ${totalMessages}`;
+      counter.textContent = `メッセージ: ${count} (5秒更新)`;
     }
 
-    function showMessages(messages) {
+    function updateLayoutClass(messageCount) {
       const container = document.getElementById('messageContainer');
-      let index = 0;
-
-      function showNextMessage() {
-        if (isTransitioning) return;
-        
-        isTransitioning = true;
-        
-        // Exit animation for current message
-        const currentMessage = container.querySelector('.message');
-        if (currentMessage) {
-          currentMessage.classList.add('exit');
-          setTimeout(() => {
-            container.innerHTML = "";
-            displayNewMessage();
-          }, 800);
-        } else {
-          displayNewMessage();
-        }
-
-        function displayNewMessage() {
-          const message = document.createElement('div');
-          message.className = 'message';
-          message.textContent = messages[index];
-          container.appendChild(message);
-
-          // Update current index for counter
-          currentMessageIndex = index + 1;
-          
-          index = (index + 1) % messages.length;
-          
-          setTimeout(() => {
-            isTransitioning = false;
-          }, 1200);
-          
-          setTimeout(showNextMessage, 4000);
-        }
+      
+      container.classList.remove('layout-1-3', 'layout-4-6', 'layout-7-12', 'layout-13-plus');
+      
+      if (messageCount <= 3) {
+        container.classList.add('layout-1-3');
+      } else if (messageCount <= 6) {
+        container.classList.add('layout-4-6');
+      } else if (messageCount <= 12) {
+        container.classList.add('layout-7-12');
+      } else {
+        container.classList.add('layout-13-plus');
       }
+    }
 
-      showNextMessage();
+    function showAllMessages(messages) {
+      const container = document.getElementById('messageContainer');
+      
+      messages.forEach((messageText, index) => {
+        if (!displayedMessages.has(messageText)) {
+          const message = document.createElement('div');
+          const isNewMessage = index >= lastMessageCount;
+          message.className = isNewMessage ? 'message new' : 'message';
+          message.textContent = messageText;
+          message.setAttribute('data-message', messageText);
+          
+          container.appendChild(message);
+          displayedMessages.add(messageText);
+          
+          if (isNewMessage) {
+            setTimeout(() => {
+              message.classList.remove('new');
+            }, 3000);
+          }
+        }
+      });
     }
 
     function showNoMessage() {
       const container = document.getElementById('messageContainer');
       container.innerHTML = "";
+      displayedMessages.clear();
 
       const message = document.createElement('div');
       message.className = 'no-message';
       message.textContent = "投稿をお待ちしています... 💬✨";
       container.appendChild(message);
-      
-      currentMessageIndex = 0;
     }
 
-    // Refresh messages every 30 seconds to get new submissions
     function startPeriodicRefresh() {
-      setInterval(fetchMessages, 30000);
+      setInterval(fetchMessages, 5000);
     }
 
     window.onload = () => {
@@ -379,7 +492,6 @@
       startPeriodicRefresh();
     };
 
-    // Add keyboard controls for presentation mode
     document.addEventListener('keydown', (e) => {
       if (e.key === 'f' || e.key === 'F') {
         if (document.fullscreenElement) {
